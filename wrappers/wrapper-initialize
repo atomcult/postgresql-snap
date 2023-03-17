@@ -49,46 +49,89 @@ LOC="$LOCLANG.$LOCEN"
 
 export LANG=$LOC
 export I18NPATH=$SNAP/usr/share/i18n
-export LOCPATH=$SNAP_USER_DATA/locales
+export LOCPATH=$SNAP_COMMON/postgresql/locales
 
 # PostgreSQL
 
-DATA_DIR="$SNAP_USER_COMMON/data"
-LOG_DIR="$SNAP_USER_COMMON/logs"
-PSQLHIST_DIR="$SNAP_USER_COMMON/history"
+PG_ROOT_DIR="$SNAP_COMMON/postgresql"
+DATA_DIR="$PG_ROOT_DIR/data"
+LOG_DIR="$PG_ROOT_DIR/logs"
+PSQLHIST_DIR="$PG_ROOT_DIR/history"
+POSTGRES_CONFIG_FILENAME="postgresql.conf"
 
 #
 # Functions
 #
 
+snap_daemon_run_command() {
+     "$SNAP/usr/bin/setpriv" --clear-groups --reuid snap_daemon --regid snap_daemon -- "$@"
+}
 
 localegen() {
-[ -e "$LOCPATH" ] || mkdir "$LOCPATH"
-
 if [ ! -e $LOCPATH/$LOC ]; then
 echo "Generating a new locale in $LOCPATH/$LOC..."
-  localedef --prefix=$LOCPATH -f $LOCEN -i $LOCLANG $LOCPATH/$LOC
+  mkdir -p "$LOCPATH/$LOC"
+  chown -R snap_daemon:snap_daemon "$LOCPATH"
+
+  snap_daemon_run_command $SNAP/usr/bin/localedef --prefix=$LOCPATH -f $LOCEN -i $LOCLANG $LOCPATH/$LOC
 fi
 }
 
 
 pginit() {
 echo "Setting up PostgreSQL environment..."
+
+echo "Root directory: $PG_ROOT_DIR"
+if [ ! -e "$PG_ROOT_DIR" ]; then
+  mkdir -p "$PG_ROOT_DIR"
+  chown snap_daemon:snap_daemon "$PG_ROOT_DIR"
+fi
+
 echo "Data directory: $DATA_DIR"
-[ -e "$DATA_DIR" ] || mkdir "$DATA_DIR"
+if [ ! -e "$DATA_DIR" ]; then
+  mkdir -p "$DATA_DIR"
+  chown snap_daemon:snap_daemon "$DATA_DIR"
+fi
 
 echo "Logs directory: $LOG_DIR"
-[ -e "$LOG_DIR" ] || mkdir "$LOG_DIR"
+if [ ! -e "$LOG_DIR" ]; then
+  mkdir -p "$LOG_DIR"
+  chown snap_daemon:snap_daemon "$LOG_DIR"
+fi
 
 echo "psql history directory: $PSQLHIST_DIR"
-[ -e "$PSQLHIST_DIR" ] || mkdir "$PSQLHIST_DIR"
+if [ ! -e "$PSQLHIST_DIR" ]; then
+  mkdir -p "$PSQLHIST_DIR"
+  chown snap_daemon:snap_daemon "$PSQLHIST_DIR"
+fi
 
-echo ".psqlrc file: $SNAP_USER_COMMON/.psqlrc"
-[ -e "$SNAP_USER_COMMON/.psqlrc" ] || echo "\set HISTFILE $PSQLHIST_DIR/psql_history- :DBNAME" > $SNAP_USER_COMMON/.psqlrc
+echo ".psqlrc file: $SNAP_COMMON/.psqlrc"
+if [ ! -e "$SNAP_COMMON/.psqlrc" ]; then
+  echo "\set HISTFILE $PSQLHIST_DIR/psql_history- :DBNAME" > $SNAP_COMMON/.psqlrc
+  chown snap_daemon:snap_daemon $SNAP_COMMON/.psqlrc
+fi
 
 echo "Checking if initdb has already been run before. If not, a new cluster will be created."
-[ -e "$DATA_DIR/base" ] || $SNAP/usr/bin/initdb -D $DATA_DIR
+[ -e "$DATA_DIR/base" ] || snap_daemon_run_command $SNAP/usr/lib/postgresql/10/bin/initdb -D $DATA_DIR
+
+echo "Create postgres config file"
+if [ ! -e "$DATA_DIR/$POSTGRES_CONFIG_FILENAME" ]; then
+ snap_daemon_run_command cp "$SNAP/$POSTGRES_CONFIG_FILENAME" "$DATA_DIR/"
+
+ # do replacement of the $SNAP, $SNAP_DATA, $SNAP_COMMON environment variables in the config files
+ snap_daemon_run_command sed -i -e "s@\$SNAP_COMMON@$SNAP_COMMON@g" \
+        -e "s@\$SNAP_DATA@$CURRENT@g" \
+        -e "s@\$SNAP@$SNAP_CURRENT@g" \
+        "$DATA_DIR/$POSTGRES_CONFIG_FILENAME"
+fi
+
+echo "Create sockets dir"
+if [ ! -e "$SNAP_COMMON/sockets" ]; then
+  mkdir -p $SNAP_COMMON/sockets
+  chown snap_daemon:snap_daemon $SNAP_COMMON/sockets
+fi
 }
+
 
 #
 # Main script

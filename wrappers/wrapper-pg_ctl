@@ -6,7 +6,7 @@ set -e
 # Locale configuration
 #
 export I18NPATH=$SNAP/usr/share/i18n
-export LOCPATH=$SNAP_USER_DATA/locales
+export LOCPATH=$SNAP_COMMON/postgresql/locales
 
 LOCLANG=en_US
 LOCEN=UTF-8
@@ -14,4 +14,10 @@ LOC="$LOCLANG.$LOCEN"
 
 export LANG=$LOC
 
-$SNAP/usr/bin/pg_ctl "$@"
+snap_daemon_run_command() {
+     "$SNAP/usr/bin/setpriv" --clear-groups --reuid snap_daemon --regid snap_daemon -- "$@"
+}
+
+snap_daemon_run_command $SNAP/usr/lib/postgresql/10/bin/pg_ctl "$@"
+
+
