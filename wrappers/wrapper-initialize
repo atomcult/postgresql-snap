@@ -48,6 +48,8 @@ fi
 LOC="$LOCLANG.$LOCEN"
 
 export LANG=$LOC
+export LC_ALL=$LOC
+export LC_TYPE=$LOC
 export I18NPATH=$SNAP/usr/share/i18n
 export LOCPATH=$SNAP_COMMON/postgresql/locales
 

@@ -17,6 +17,7 @@ assumes: [snapd2.45]
 
 apps:
   postgres-service:
+       install-mode: disable
        daemon: forking
        command: usr/bin/wrapper-pg_ctl start -l $SNAP_COMMON/postgresql/logs/postgres.log -D $SNAP_COMMON/postgresql/data 
        command-chain: [bin/snapcraft-preload]
