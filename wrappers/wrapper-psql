@@ -8,6 +8,6 @@ snap_daemon_run_command() {
      "$SNAP/usr/bin/setpriv" --clear-groups --reuid snap_daemon --regid snap_daemon -- "$@"
 }
 
-snap_daemon_run_command $SNAP/usr/lib/postgresql/10/bin/psql "$@"
+snap_daemon_run_command $SNAP/usr/lib/postgresql/14/bin/psql "$@"
 
 

@@ -112,7 +112,7 @@ if [ ! -e "$SNAP_COMMON/.psqlrc" ]; then
 fi
 
 echo "Checking if initdb has already been run before. If not, a new cluster will be created."
-[ -e "$DATA_DIR/base" ] || snap_daemon_run_command $SNAP/usr/lib/postgresql/10/bin/initdb -D $DATA_DIR
+[ -e "$DATA_DIR/base" ] || snap_daemon_run_command $SNAP/usr/lib/postgresql/14/bin/initdb -D $DATA_DIR
 
 echo "Create postgres config file"
 if [ ! -e "$DATA_DIR/$POSTGRES_CONFIG_FILENAME" ]; then

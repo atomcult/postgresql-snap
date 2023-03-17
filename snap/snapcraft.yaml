@@ -52,8 +52,8 @@ parts:
     plugin: cmake
     build-packages:
       - to arm64:
-          - g++-multilib-arm-linux-gnueabihf
-          - gcc-multilib-arm-linux-gnueabihf
+          - g++-arm-linux-gnueabihf
+          - gcc-arm-linux-gnueabihf
       - else:
           - gcc-multilib
           - g++-multilib
