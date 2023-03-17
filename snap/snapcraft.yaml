@@ -1,6 +1,6 @@
-name: postgresql10
-version: "10.0"
-base: core18
+name: postgresql14
+version: "14.0"
+base: core22
 summary: PostgreSQL is a powerful, open source object-relational database system.
 description: |
   PostgreSQL is a powerful, open source object-relational database system.
@@ -38,7 +38,7 @@ parts:
         - libecpg-dev
         - libc-bin
         - locales
-        - setpriv
+        - util-linux
   wrapper:
     plugin: make
     source: .
@@ -61,12 +61,12 @@ parts:
       - to amd64:
           - lib32stdc++6 
     override-build: |
-      cd $SNAPCRAFT_PART_SRC 
-      cmake -DCMAKE_INSTALL_PREFIX=$SNAPCRAFT_PART_INSTALL/ .
+      cd $CRAFT_PART_SRC 
+      cmake -DCMAKE_INSTALL_PREFIX=$CRAFT_PART_INSTALL/ .
       make install
 
 environment:
-        LD_LIBRARY_PATH: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET 
+        LD_LIBRARY_PATH: $SNAP/usr/lib/$CRAFT_ARCH_TRIPLET 
 
 plugs:
   home:
