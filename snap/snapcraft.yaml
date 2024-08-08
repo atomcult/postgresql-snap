@@ -17,29 +17,29 @@ assumes: [snapd2.45]
 
 apps:
   postgres-service:
-       install-mode: disable
-       daemon: forking
-       command: usr/bin/wrapper-pg_ctl start -l $SNAP_COMMON/postgresql/logs/postgres.log -D $SNAP_COMMON/postgresql/data 
-       command-chain: [bin/snapcraft-preload]
-       plugs:
-         - network
-         - network-bind
-       environment:
-         SNAPCRAFT_PRELOAD_REDIRECT_ONLY_SHM: 1
+    install-mode: disable
+    daemon: forking
+    command: usr/bin/wrapper-pg_ctl start -l $SNAP_COMMON/postgresql/logs/postgres.log -D $SNAP_COMMON/postgresql/data 
+    command-chain: [bin/snapcraft-preload]
+    plugs:
+      - network
+     - network-bind
+    environment:
+      SNAPCRAFT_PRELOAD_REDIRECT_ONLY_SHM: 1
   psql:
-       command: usr/bin/wrapper-psql
-       plugs: [network]
-  
+    command: usr/bin/wrapper-psql
+    plugs: [network]
+
 parts:
   postgresql:
     plugin: nil
     stage-packages:
-        - postgresql
-        - postgresql-contrib
-        - libecpg-dev
-        - libc-bin
-        - locales
-        - util-linux
+      - postgresql
+      - postgresql-contrib
+      - libecpg-dev
+      - libc-bin
+      - locales
+      - util-linux
   wrapper:
     plugin: make
     source: .
@@ -53,21 +53,21 @@ parts:
     plugin: cmake
     build-packages:
       - to arm64:
-          - g++-arm-linux-gnueabihf
-          - gcc-arm-linux-gnueabihf
+        - g++-arm-linux-gnueabihf
+        - gcc-arm-linux-gnueabihf
       - else:
-          - gcc-multilib
-          - g++-multilib
+        - gcc-multilib
+        - g++-multilib
     stage-packages:
       - to amd64:
-          - lib32stdc++6 
+        - lib32stdc++6 
     override-build: |
       cd $CRAFT_PART_SRC 
       cmake -DCMAKE_INSTALL_PREFIX=$CRAFT_PART_INSTALL/ .
       make install
 
 environment:
-        LD_LIBRARY_PATH: $SNAP/usr/lib/$CRAFT_ARCH_TRIPLET 
+  LD_LIBRARY_PATH: $SNAP/usr/lib/$CRAFT_ARCH_TRIPLET 
 
 plugs:
   home:
