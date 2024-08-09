@@ -1,6 +1,6 @@
-name: postgresql14
-version: "14.0"
-base: core22
+name: postgresql
+base: core24
+adopt-info: postgresql
 summary: PostgreSQL is a powerful, open source object-relational database system.
 description: |
   PostgreSQL is a powerful, open source object-relational database system.
@@ -16,25 +16,34 @@ system-usernames:
 assumes: [snapd2.45]
 
 apps:
-  postgres-service:
+  daemon:
     install-mode: disable
     daemon: forking
     command: usr/bin/wrapper-pg_ctl start -l $SNAP_COMMON/postgresql/logs/postgres.log -D $SNAP_COMMON/postgresql/data 
     command-chain: [bin/snapcraft-preload]
     plugs:
+      - home
       - network
-     - network-bind
+      - network-bind
+      - shared-memory
     environment:
       SNAPCRAFT_PRELOAD_REDIRECT_ONLY_SHM: 1
+      LD_LIBRARY_PATH: $SNAP/usr/lib/$CRAFT_ARCH_TRIPLET 
   psql:
     command: usr/bin/wrapper-psql
-    plugs: [network]
+    plugs: 
+      - home
+      - network
 
 parts:
   postgresql:
     plugin: nil
+    override-build: |
+      craftctl set version="$(apt-show-versions -a postgresql-16 | head -n -1 | tail -1 | cut -f2 -d' ')"
+    build-packages:
+      - apt-show-versions
     stage-packages:
-      - postgresql
+      - postgresql-16
       - postgresql-contrib
       - libecpg-dev
       - libc-bin
@@ -66,8 +75,6 @@ parts:
       cmake -DCMAKE_INSTALL_PREFIX=$CRAFT_PART_INSTALL/ .
       make install
 
-environment:
-  LD_LIBRARY_PATH: $SNAP/usr/lib/$CRAFT_ARCH_TRIPLET 
-
 plugs:
-  home:
+  shared-memory:
+    private: true
