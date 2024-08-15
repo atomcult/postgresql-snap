@@ -27,8 +27,8 @@ apps:
       - network-bind
       - shared-memory
     environment:
-      SNAPCRAFT_PRELOAD_REDIRECT_ONLY_SHM: 1
-      LD_LIBRARY_PATH: $SNAP/usr/lib/$CRAFT_ARCH_TRIPLET 
+      SNAPCRAFT_PRELOAD_REDIRECT_ONLY_SHM: "1"
+      LD_LIBRARY_PATH: $SNAP/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR 
   psql:
     command: usr/bin/wrapper-psql
     plugs: 
