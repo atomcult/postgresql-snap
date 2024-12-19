@@ -52,10 +52,26 @@ parts:
     stage-packages:
       - postgresql-16
       - postgresql-contrib
-      - libecpg-dev
+    stage:
+      - -usr/share/doc
+      - -usr/share/man
+
+  locales:
+    plugin: nil
+    stage-packages:
       - libc-bin
       - locales
+    stage:
+      - usr/bin/localedef
+      - usr/lib/locale
+      - usr/share/i18n
+
+  setpriv:
+    plugin: nil
+    stage-packages:
       - util-linux
+    stage:
+      - usr/bin/setpriv
 
   scripts:
     plugin: dump
@@ -80,3 +96,4 @@ parts:
       cd $CRAFT_PART_SRC 
       cmake -DCMAKE_INSTALL_PREFIX=$CRAFT_PART_INSTALL/ .
       make install
+      find "${CRAFT_PART_INSTALL}" -name '*.so' -exec strip {} \;
