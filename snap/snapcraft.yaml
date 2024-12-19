@@ -49,9 +49,12 @@ parts:
       - libc-bin
       - locales
       - util-linux
-  wrapper:
-    plugin: make
-    source: .
+
+  wrappers:
+    plugin: dump
+    source: wrappers
+    organize:
+      '*': usr/bin/
 
   config:
     plugin: dump
