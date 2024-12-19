@@ -1,10 +1,17 @@
-# postgresql-snap
-PostgreSQL snapcraft recipes
+# Postgresql Snap
+PostgreSQL Snapcraft recipes
 
 ## Notes
-- once installed, postgres is automatically configured and the postgres service is automatically started
-- to launch client:
+- Once installed, Postgres is automatically configured.
+- To launch the client:
+```sh
+sudo postgresql16.psql
 ```
-sudo postgresql16.psql -h "/var/snap/postgresql16/common/sockets/" postgres
-```
-note that psql runs with snap_daemon user privileges
+> [!WARNING]
+> By default the user `postgres` is created with the password `changeme`. Be sure to change this after starting a client session:
+> ```sql
+> ALTER USER postgres WITH PASSWORD 'new_password';
+> ```
+
+> [!NOTE]
+> `psql` runs as user `snap_daemon`.
