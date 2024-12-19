@@ -37,11 +37,15 @@ pginit() {
   }
 
   echo "Checking if initdb has already been run before. If not, a new cluster will be created."
-  [ -e "${DATA_DIR}/postgresql.conf" ] ||
+  [ -e "${DATA_DIR}/postgresql.conf" ] || {
+    echo "${PGPASS}" >/tmp/pg_pass
+
     run "${SNAP}/usr/lib/postgresql/16/bin/initdb" \
       --username postgres \
+      --pwfile /tmp/pg_pass \
       --auth-host scram-sha-256 \
       --set "unix_socket_directories=${SOCK_DIR}"
+  }
 }
 
 main() {

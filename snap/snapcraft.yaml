@@ -19,6 +19,11 @@ plugs:
   shared-memory:
     private: true
 
+hooks:
+  install:
+    environment:
+      PGPASS: "changeme"
+
 apps:
   daemon:
     daemon: forking
