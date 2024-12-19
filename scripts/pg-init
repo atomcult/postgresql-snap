@@ -7,7 +7,7 @@ localegen() {
   [ ! -e "${LOCPATH}/${LOC}" ] ||
     return 0
 
-  echo "Generating a new locale in ${LOCPATH}/${LOC}..."
+  echo "Generating new locale: ${LOCPATH}/${LOC}..."
   mkdir -p "${LOCPATH}/${LOC}"
   chown -R snap_daemon:snap_daemon "${LOCPATH}"
 
@@ -24,11 +24,12 @@ pginit() {
     [ ! -e "${path}" ] ||
       continue
 
+    echo "Creating directory: ${path}"
     mkdir -p "${path}"
     chown snap_daemon:snap_daemon "${path}"
   done
 
-  echo ".psqlrc file: ${PSQLRC}"
+  echo "Creating psql config: ${PSQLRC}"
   [ -e "${PSQLRC}" ] || {
     printf >"${PSQLRC}" \
       '\set HISTFILE %s/psql_history- :DBNAME' \
@@ -36,10 +37,11 @@ pginit() {
     chown snap_daemon:snap_daemon "${PSQLRC}"
   }
 
-  echo "Checking if initdb has already been run before. If not, a new cluster will be created."
+  echo "Checking if initdb has already been run before."
   [ -e "${DATA_DIR}/postgresql.conf" ] || {
-    echo "${PGPASS}" >/tmp/pg_pass
+    echo "Running initdb"
 
+    echo "${PGPASS}" >/tmp/pg_pass
     run "${SNAP}/usr/lib/postgresql/16/bin/initdb" \
       --username postgres \
       --pwfile /tmp/pg_pass \
