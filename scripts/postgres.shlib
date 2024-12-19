@@ -1,0 +1,30 @@
+#!/bin/sh
+
+# Locale
+LOC_LANG="en_US"
+LOC_ENCODING="UTF-8"
+LOC="${LOC_LANG}.${LOC_ENCODING}"
+
+export LANG="${LOC}"
+export LC_ALL="${LOC}"
+export LC_TYPE="${LOC}"
+export I18NPATH="${SNAP}/usr/share/i18n"
+export LOCPATH="${SNAP_COMMON}/locales"
+
+# PostgreSQL
+DATA_DIR="${SNAP_DATA}/data"
+LOG_DIR="${SNAP_DATA}/logs"
+PSQLHIST_DIR="${SNAP_DATA}/history"
+SOCK_DIR="/tmp/postgres"
+
+export PGDATA="${DATA_DIR}"
+export PSQLRC="${SNAP_COMMON}/.psqlrc"
+
+# Functions
+run() {
+  "${SNAP}/usr/bin/setpriv" \
+    --clear-groups \
+    --reuid snap_daemon \
+    --regid snap_daemon \
+    -- "$@"
+}

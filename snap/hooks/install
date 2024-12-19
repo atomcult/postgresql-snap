@@ -1,4 +1,3 @@
 #!/bin/sh
 
-$SNAP/usr/bin/wrapper-initialize newlocale en_US UTF-8
-$SNAP/usr/bin/wrapper-initialize initdb en_US UTF-8
+exec "${SNAP}/usr/bin/pg-init"

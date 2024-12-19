@@ -1,0 +1,12 @@
+#!/bin/sh
+
+# shellcheck source=scripts/postgres.shlib
+. "${SNAP}/usr/bin/postgres.shlib"
+
+main() {
+  set -eu
+
+  run "${SNAP}/usr/lib/postgresql/16/bin/pg_ctl" "$@"
+}
+
+main "$@"

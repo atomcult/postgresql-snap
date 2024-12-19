@@ -7,33 +7,34 @@ description: |
   It has more than 15 years of active development and a proven architecture
   that has earned it a strong reputation for reliability, data integrity,
   and correctness.
+
+assumes: [snapd2.45]
 confinement: strict
 grade: stable
 
 system-usernames:
   snap_daemon: shared
 
-assumes: [snapd2.45]
+plugs:
+  shared-memory:
+    private: true
 
 apps:
   daemon:
     daemon: forking
     install-mode: disable
     command-chain: [ bin/snapcraft-preload ]
-    command: usr/bin/wrapper-pg_ctl start -l $SNAP_COMMON/postgresql/logs/postgres.log -D $SNAP_COMMON/postgresql/data 
+    command: usr/bin/pg-pg_ctl start
     environment:
       SNAPCRAFT_PRELOAD_REDIRECT_ONLY_SHM: "1"
-      LD_LIBRARY_PATH: $SNAP/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR 
     plugs:
-      - home          # Only necessary on Desktop/Server systems
       - network
       - network-bind
       - shared-memory
 
   psql:
-    command: usr/bin/wrapper-psql
+    command: usr/bin/pg-psql
     plugs: 
-      - home          # Only necessary on Desktop/Server systems
       - network
 
 parts:
@@ -56,15 +57,11 @@ parts:
       - locales
       - util-linux
 
-  wrappers:
+  scripts:
     plugin: dump
-    source: wrappers
+    source: scripts
     organize:
       '*': usr/bin/
-
-  config:
-    plugin: dump
-    source: config
 
   snapcraft-preload:
     source: https://github.com/sergiusens/snapcraft-preload.git
@@ -83,7 +80,3 @@ parts:
       cd $CRAFT_PART_SRC 
       cmake -DCMAKE_INSTALL_PREFIX=$CRAFT_PART_INSTALL/ .
       make install
-
-plugs:
-  shared-memory:
-    private: true
